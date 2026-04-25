@@ -3,99 +3,100 @@
 
 #define SIZE 20
 
-typedef struct {
+typedef struct
+{
     char buffer[SIZE];
-    int head;
-    int tail;
-    int count;
+    int front;
+    int rear;
+    int itemsCount;
+
 } CircularBuffer;
 
-void init(CircularBuffer *cb)
+void initBuffer(CircularBuffer *cb)
 {
-    cb->head = 0;
-    cb->tail = 0;
-    cb->count = 0;
+    cb->front = 0;
+    cb->rear = 0;
+    cb->itemsCount = 0;
 }
 
 int isFull(CircularBuffer *cb)
 {
-    return cb->count == SIZE;
-}
-int isEmpty(CircularBuffer *cb)
-{
-    return cb->count == 0;
+    return cb->itemsCount == SIZE;
 }
 
-void writeBuffer(CircularBuffer *cb, char data)
+int isEmpty(CircularBuffer *cb)
 {
-    if(isFull(cb))
+    return cb->itemsCount == 0;
+}
+
+void enqueue(CircularBuffer *cb, char data)
+{
+    if (isFull(cb))
     {
-        printf("Buffer Overflow\n");
+        printf("Error: Buffer Full\n");
         return;
     }
 
-    cb->buffer[cb->tail] = data;
+    cb->buffer[cb->rear] = data;
 
-    cb->tail = (cb->tail + 1) % SIZE;
+    cb->rear = (cb->rear + 1) % SIZE;
 
-    cb->count++;
+    cb->itemsCount++;
 }
 
-char readBuffer(CircularBuffer *cb)
+char dequeue(CircularBuffer *cb)
 {
     char data;
 
-    if(isEmpty(cb))
+    if (isEmpty(cb))
     {
-        printf("Buffer Underflow\n");
+        printf("Error: Buffer Empty\n");
         return '\0';
     }
 
-    data = cb->buffer[cb->head];
+    data = cb->buffer[cb->front];
 
-    cb->head = (cb->head + 1) % SIZE;
+    cb->front = (cb->front + 1) % SIZE;
 
-    cb->count--;
+    cb->itemsCount--;
 
     return data;
 }
-
-
 
 int main()
 {
     CircularBuffer cb;
 
     char name[50];
-
-    int i;
     char ch;
 
-    init(&cb);
+    int i;
 
-    printf("Enter your name: ");
+    initBuffer(&cb);
+
+    printf("Please enter your name: ");
     scanf("%s", name);
 
     strcat(name, "CE-ESY");
-  
+
     for(i = 0; name[i] != '\0'; i++)
     {
-        writeBuffer(&cb, name[i]);
+        enqueue(&cb, name[i]);
     }
-
 
     printf("Output: ");
 
     while(!isEmpty(&cb))
     {
-        ch = readBuffer(&cb);
+        ch = dequeue(&cb);
         printf("%c", ch);
     }
 
     printf("\n");
+
     if(isEmpty(&cb))
     {
-        printf("Buffer is now empty.\n");
+        printf("Buffer emptied successfully.\n");
     }
 
     return 0;
